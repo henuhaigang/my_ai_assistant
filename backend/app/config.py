@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     DASHSCOPE_API_KEY: Optional[str] = None
     LLM_PROVIDER: str = "openai"
+    OLLAMA_BASE_URL: str = "http://localhost:11434/v1"
+    OLLAMA_MODEL: str = "qwen3:30b-a3b"
+    OLLAMA_EMBEDDINGS_MODEL: str = "nomic-embed-text"
     CHROMA_PERSIST_DIR: str = "./chroma_data"
     WEATHER_API_KEY: Optional[str] = None
 

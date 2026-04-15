@@ -1,122 +1,866 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        #messages { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; }
-        .message { margin: 10px 0; padding: 8px; border-radius: 8px; }
-        .user { background: #007aff; color: white; text-align: right; }
-        .assistant { background: #e5e5ea; color: black; }
-        #input { width: 100%; margin: 10px 0; }
-        button { padding: 8px 16px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .login-box h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        
+        .login-box p {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+        
+        .login-box input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e5e5ea;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+            outline: none;
+        }
+        
+        .login-box input:focus {
+            border-color: #0055ff;
+            box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.1);
+        }
+        
+        .login-box button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0055ff 0%, #0044cc 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .login-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 85, 255, 0.3);
+        }
+        
+        /* Chat Container */
+        .chat-container {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Header */
+        .chat-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid #f2f2f7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .chat-header-avatar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #0055ff 0%, #00d4ff 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .chat-header-info h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .chat-header-info span {
+            font-size: 13px;
+            color: #34c759;
+        }
+        
+        .logout-btn {
+            padding: 10px 20px;
+            background: #f2f2f7;
+            border: none;
+            border-radius: 10px;
+            color: #1a1a1a;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: #e5e5ea;
+        }
+        
+        /* System Prompt Section */
+        .system-prompt-section {
+            padding: 16px 24px;
+            background: #f9f9fb;
+            border-bottom: 1px solid #f2f2f7;
+        }
+        
+        .system-prompt-label {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .system-prompt-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e5ea;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .system-prompt-input:focus {
+            border-color: #0055ff;
+            box-shadow: 0 0 0 3px rgba(0, 85, 255, 0.1);
+        }
+        
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        /* Message Wrapper */
+        .message-wrapper {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .message-avatar.user {
+            background: linear-gradient(135deg, #0055ff 0%, #00d4ff 100%);
+            color: white;
+        }
+        
+        .message-avatar.assistant {
+            background: linear-gradient(135deg, #34c759 0%, #30d158 100%);
+            color: white;
+        }
+        
+        .message-content-wrapper {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* Thinking Box */
+        .thinking-box {
+            background: linear-gradient(135deg, #fef9e7 0%, #fdf3d0 100%);
+            border: 1px solid #f5e6a3;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #856404;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 20px;
+            user-select: none;
+        }
+        
+        .thinking-box:hover {
+            background: linear-gradient(135deg, #fef3d0 0%, #fcefc4 100%);
+        }
+        
+        .thinking-box::after {
+            content: '收起';
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            font-size: 12px;
+            color: #856404;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .thinking-box.collapsed::after {
+            content: '展开';
+        }
+        
+        .thinking-content {
+            display: block;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .thinking-content.hidden {
+            display: none;
+        }
+        
+        /* Thinking Animation */
+        .thinking-animation {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+        }
+        
+        .thinking-dot {
+            width: 6px;
+            height: 6px;
+            background: #856404;
+            border-radius: 50%;
+            animation: thinkingPulse 1.4s infinite ease-in-out;
+        }
+        
+        .thinking-dot:nth-child(1) { animation-delay: 0s; }
+        .thinking-dot:nth-child(2) { animation-delay: 0.2s; }
+        .thinking-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes thinkingPulse {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
+            30% { transform: scale(1.3); opacity: 1; }
+        }
+        
+        /* Message Content */
+        .message-content {
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: normal;
+            overflow-wrap: break-word;
+            animation: typeIn 0.1s ease;
+        }
+        
+        @keyframes typeIn {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+        
+        .message-wrapper.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message-wrapper.user .message-content-wrapper {
+            align-items: flex-end;
+        }
+        
+        .message-wrapper.user .message-content {
+            background: linear-gradient(135deg, #0055ff 0%, #0044cc 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-wrapper.assistant .message-content {
+            background: #f2f2f7;
+            color: #1a1a1a;
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Cursor Animation */
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em;
+            background: #0055ff;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Input Area */
+        .input-area {
+            padding: 16px 24px 24px;
+            background: white;
+            border-top: 1px solid #f2f2f7;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        #input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e5e5ea;
+            border-radius: 16px;
+            font-size: 15px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            min-height: 48px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        #input:focus {
+            border-color: #0055ff;
+            box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.1);
+        }
+        
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #0055ff 0%, #0044cc 100%);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 85, 255, 0.3);
+        }
+        
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .send-btn:disabled {
+            background: #c7c7cc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .send-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        /* Welcome Message */
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8e8e93;
+        }
+        
+        .welcome-message h2 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        
+        .welcome-message p {
+            font-size: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        /* Scrollbar */
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .messages-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .messages-area::-webkit-scrollbar-thumb {
+            background: #d1d1d6;
+            border-radius: 3px;
+        }
+        
+        .messages-area::-webkit-scrollbar-thumb:hover {
+            background: #c7c7cc;
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <h1>AI Assistant</h1>
-        <div>
+    <!-- Login Screen -->
+    <div id="login-container" class="login-container">
+        <div class="login-box">
+            <h1>AI Assistant</h1>
+            <p>智能对话助手，随时为您效劳</p>
             <input type="text" id="username" placeholder="用户名">
             <input type="password" id="password" placeholder="密码">
             <button onclick="login()">登录</button>
         </div>
-        <hr>
-        <div id="chat-area" style="display:none;">
-            <div id="messages"></div>
-            <textarea id="input" rows="3" placeholder="输入消息..."></textarea>
-            <button onclick="sendMessage()">发送</button>
+    </div>
+    
+    <!-- Chat Screen -->
+    <div id="chat-container" class="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <div class="chat-header-avatar">AI</div>
+                <div class="chat-header-info">
+                    <h2>AI 助手</h2>
+                    <span>在线</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+        
+        <div class="system-prompt-section">
+            <div class="system-prompt-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                System Prompt (可选)
+            </div>
+            <input type="text" class="system-prompt-input" id="system-prompt" placeholder="设置 AI 助手的角色和行为..." value="You are a helpful assistant.">
+        </div>
+        
+        <div class="messages-area" id="messages-area">
+            <div class="welcome-message">
+                <h2>👋 欢迎使用 AI 助手</h2>
+                <p>我是您的智能对话助手，可以回答问题、编写代码、创作内容等。有什么我可以帮您的吗？</p>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea id="input" rows="1" placeholder="输入消息..." onkeydown="handleKeyDown(event)"></textarea>
+                </div>
+                <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
+    
     <script>
         let token = localStorage.getItem('token');
         let currentConvId = null;
-
+        let isLoading = false;
+        
+        // Auto-resize textarea
+        const input = document.getElementById('input');
+        input.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        // Handle Enter key
+        function handleKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        // Login
         async function login() {
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+            
             const formData = new URLSearchParams();
             formData.append('username', username);
             formData.append('password', password);
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: formData
-            });
-            const data = await res.json();
-            if (res.ok) {
-                token = data.access_token;
-                localStorage.setItem('token', token);
-                document.getElementById('chat-area').style.display = 'block';
-                loadConversations();
-            } else {
-                alert('登录失败');
+            
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: formData
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    token = data.access_token;
+                    localStorage.setItem('token', token);
+                    showChat();
+                    loadConversations();
+                } else {
+                    alert('登录失败，请检查用户名和密码');
+                }
+            } catch (err) {
+                alert('登录失败: ' + err.message);
             }
         }
-
+        
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            token = null;
+            currentConvId = null;
+            document.getElementById('login-container').style.display = 'flex';
+            document.getElementById('chat-container').style.display = 'none';
+            document.getElementById('messages-area').innerHTML = `
+                <div class="welcome-message">
+                    <h2>👋 欢迎使用 AI 助手</h2>
+                    <p>我是您的智能对话助手，可以回答问题、编写代码、创作内容等。有什么我可以帮您的吗？</p>
+                </div>
+            `;
+        }
+        
+        // Show chat
+        function showChat() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('chat-container').style.display = 'flex';
+        }
+        
+        // Load conversations
         async function loadConversations() {
-            const res = await fetch('/api/chat/conversations', {
-                headers: {'Authorization': `Bearer ${token}`}
-            });
-            const convs = await res.json();
-            if (convs.length) {
-                currentConvId = convs[0].id;
+            try {
+                const res = await fetch('/api/chat/conversations', {
+                    headers: {'Authorization': `Bearer ${token}`}
+                });
+                const convs = await res.json();
+                if (convs.length) {
+                    currentConvId = convs[0].id;
+                    loadMessages(convs[0].id);
+                }
+            } catch (err) {
+                console.error('Failed to load conversations:', err);
             }
         }
-
-        async function sendMessage() {
-            const input = document.getElementById('input');
-            const msg = input.value;
-            if (!msg) return;
-            input.value = '';
-            addMessage('user', msg);
-            const res = await fetch('/api/chat/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    conversation_id: currentConvId,
-                    message: msg
-                })
-            });
-            const reader = res.body.getReader();
-            const decoder = new TextDecoder();
-            let assistantMsgDiv = null;
-            let fullContent = '';
-            while (true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        if (data === '[DONE]') continue;
-                        fullContent += data;
-                        if (!assistantMsgDiv) {
-                            assistantMsgDiv = addMessage('assistant', fullContent);
-                        } else {
-                            assistantMsgDiv.innerHTML = fullContent;
-                        }
-                    }
+        
+        // Load messages for a conversation
+        async function loadMessages(convId) {
+            // TODO: Implement message history loading
+        }
+        
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Add message to UI
+        function addMessage(role, content, thinking = '') {
+            const messagesArea = document.getElementById('messages-area');
+            
+            // Remove welcome message if exists
+            const welcome = messagesArea.querySelector('.welcome-message');
+            if (welcome) welcome.remove();
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${role}`;
+            
+            const avatar = role === 'user' ? 'U' : 'AI';
+            
+            let thinkingHtml = '';
+            if (role === 'assistant') {
+                if (thinking) {
+                    thinkingHtml = `
+                        <div class="thinking-box expanded" onclick="toggleThinking(this)">
+                            <span class="thinking-content">🤔 思考中...\n${escapeHtml(thinking)}</span>
+                        </div>
+                    `;
+                } else {
+                    thinkingHtml = `
+                        <div class="thinking-box collapsed" id="thinking-placeholder" style="display:none;">
+                            <span class="thinking-content">🤔 思考中...</span>
+                        </div>
+                    `;
                 }
             }
+            
+            wrapper.innerHTML = `
+                <div class="message-avatar ${role}">${avatar}</div>
+                <div class="message-content-wrapper">
+                    ${thinkingHtml}
+                    <div class="message-content">${escapeHtml(content)}<span class="cursor"></span></div>
+                </div>
+            `;
+            
+            messagesArea.appendChild(wrapper);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            return {
+                wrapper,
+                contentEl: wrapper.querySelector('.message-content'),
+                thinkingEl: wrapper.querySelector('.thinking-box')
+            };
         }
-
-        function addMessage(role, content) {
-            const messagesDiv = document.getElementById('messages');
-            const div = document.createElement('div');
-            div.className = `message ${role}`;
-            div.textContent = content;
-            messagesDiv.appendChild(div);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            return div;
+        
+        // Toggle thinking box
+        function toggleThinking(el) {
+            const content = el.querySelector('.thinking-content');
+            if (el.classList.contains('expanded')) {
+                el.classList.remove('expanded');
+                el.classList.add('collapsed');
+                content.classList.add('hidden');
+            } else {
+                el.classList.remove('collapsed');
+                el.classList.add('expanded');
+                content.classList.remove('hidden');
+            }
         }
-
+        
+        // Send message
+        async function sendMessage() {
+            const inputEl = document.getElementById('input');
+            const msg = inputEl.value.trim();
+            
+            if (!msg || isLoading) return;
+            
+            // Clear input immediately
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+            
+            isLoading = true;
+            document.getElementById('send-btn').disabled = true;
+            
+            // Add user message
+            addMessage('user', msg, '');
+            
+            // Create wrapper for assistant response
+            const messagesArea = document.getElementById('messages-area');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper assistant';
+            wrapper.innerHTML = `
+                <div class="message-avatar assistant">AI</div>
+                <div class="message-content-wrapper">
+                    <div class="thinking-box collapsed" style="display: none;" onclick="toggleThinking(this)">
+                        <span class="thinking-content"></span>
+                    </div>
+                    <div class="message-content"></div>
+                </div>
+            `;
+            messagesArea.appendChild(wrapper);
+            
+            const contentEl = wrapper.querySelector('.message-content');
+            const thinkingEl = wrapper.querySelector('.thinking-box');
+            
+            // Show thinking indicator while waiting
+            thinkingEl.style.display = 'block';
+            thinkingEl.classList.remove('collapsed');
+            thinkingEl.classList.add('expanded');
+            thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...';
+            
+            // Variables to collect content
+            let thinkingText = '';
+            let contentText = '';
+            let inThinking = false;
+            let pendingText = '';
+            
+            try {
+                const res = await fetch('/api/chat/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        conversation_id: currentConvId,
+                        message: msg,
+                        system_prompt: document.getElementById('system-prompt').value || null
+                    })
+                });
+                
+                if (!res.ok) {
+                    throw new Error('请求失败');
+                }
+                
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    
+                    buffer += decoder.decode(value, {stream: true});
+                    
+                    // Process all complete lines
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+                    
+                    for (const line of lines) {
+                        if (!line.startsWith('data:')) continue;
+                        
+                        const data = line.substring(5);
+                        if (!data && data !== ' ') continue;
+                        
+                        // Accumulate with pending text
+                        const text = pendingText + data;
+                        
+                        // Check if we're in thinking mode
+                        if (inThinking) {
+                            const endIdx = text.indexOf('[/THINKING]');
+                            if (endIdx !== -1) {
+                                thinkingText += text.substring(0, endIdx);
+                                pendingText = text.substring(endIdx + 11);
+                                inThinking = false;
+                                
+                                // Update thinking display
+                                thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + thinkingText;
+                                
+                                // Process remaining text after [/THINKING]
+                                if (pendingText) {
+                                    const startIdx = pendingText.indexOf('[THINKING]');
+                                    if (startIdx !== -1) {
+                                        contentText += pendingText.substring(0, startIdx);
+                                        pendingText = pendingText.substring(startIdx + 10);
+                                        inThinking = true;
+                                    } else {
+                                        contentText += pendingText;
+                                        pendingText = '';
+                                    }
+                                }
+                            } else {
+                                pendingText = text;
+                            }
+                        } else {
+                            const startIdx = text.indexOf('[THINKING]');
+                            if (startIdx !== -1) {
+                                contentText += text.substring(0, startIdx);
+                                pendingText = text.substring(startIdx + 10);
+                                inThinking = true;
+                            } else {
+                                contentText += text;
+                                pendingText = '';
+                            }
+                        }
+                        
+                        messagesArea.scrollTop = messagesArea.scrollHeight;
+                    }
+                }
+                
+                // Handle remaining text
+                if (pendingText) {
+                    if (inThinking) {
+                        thinkingText += pendingText;
+                    } else {
+                        contentText += pendingText;
+                    }
+                }
+                
+                // Final render - only show content after thinking is complete
+                thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + thinkingText;
+                contentEl.textContent = contentText;
+                
+                // Hide thinking box if no thinking content
+                if (!thinkingText.trim()) {
+                    thinkingEl.style.display = 'none';
+                }
+                
+            } catch (err) {
+                thinkingEl.style.display = 'none';
+                contentEl.textContent = '抱歉，发生了错误: ' + err.message;
+                contentEl.style.color = '#ff3b30';
+            } finally {
+                isLoading = false;
+                document.getElementById('send-btn').disabled = false;
+            }
+        }
+        
+        // Check token on load
         if (token) {
-            document.getElementById('chat-area').style.display = 'block';
+            showChat();
             loadConversations();
         }
     </script>

@@ -394,6 +394,12 @@
             min-height: 48px;
             transition: all 0.3s ease;
             font-family: inherit;
+            /* 隐藏滚动条 */
+            overflow-y: hidden;
+        }
+        
+        #input::-webkit-scrollbar {
+            display: none;
         }
         
         #input:focus {
@@ -481,8 +487,8 @@
         <div class="login-box">
             <h1>AI Assistant</h1>
             <p>智能对话助手，随时为您效劳</p>
-            <input type="text" id="username" placeholder="用户名">
-            <input type="password" id="password" placeholder="密码">
+            <input type="text" id="username" placeholder="用户名" onkeypress="handleLoginKeyPress(event)">
+            <input type="password" id="password" placeholder="密码" onkeypress="handleLoginKeyPress(event)">
             <button onclick="login()">登录</button>
         </div>
     </div>
@@ -546,7 +552,14 @@
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
         
-        // Handle Enter key
+        // Handle Enter key for login
+        function handleLoginKeyPress(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        }
+        
+        // Handle Enter key for chat
         function handleKeyDown(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -709,7 +722,7 @@
             
             // Clear input immediately
             inputEl.value = '';
-            inputEl.style.height = 'auto';
+            inputEl.style.height = '48px';
             
             isLoading = true;
             document.getElementById('send-btn').disabled = true;
@@ -740,12 +753,14 @@
             thinkingEl.classList.remove('collapsed');
             thinkingEl.classList.add('expanded');
             thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...';
+            // Don't show content during thinking - wait until complete
             
             // Variables to collect content
             let thinkingText = '';
             let contentText = '';
             let inThinking = false;
             let pendingText = '';
+            let preThinkingContent = '';
             
             try {
                 const res = await fetch('/api/chat/chat', {
@@ -783,70 +798,88 @@
                         if (!line.startsWith('data:')) continue;
                         
                         const data = line.substring(5);
-                        if (!data && data !== ' ') continue;
+                        if (!data.trim()) continue;
                         
-                        // Accumulate with pending text
-                        const text = pendingText + data;
+                        // Process the data character by character to properly handle tags
+                        let processedContent = '';
+                        let i = 0;
                         
-                        // Check if we're in thinking mode
-                        if (inThinking) {
-                            const endIdx = text.indexOf('[/THINKING]');
-                            if (endIdx !== -1) {
-                                thinkingText += text.substring(0, endIdx);
-                                pendingText = text.substring(endIdx + 11);
-                                inThinking = false;
-                                
-                                // Update thinking display
-                                thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + thinkingText;
-                                
-                                // Process remaining text after [/THINKING]
-                                if (pendingText) {
-                                    const startIdx = pendingText.indexOf('[THINKING]');
-                                    if (startIdx !== -1) {
-                                        contentText += pendingText.substring(0, startIdx);
-                                        pendingText = pendingText.substring(startIdx + 10);
-                                        inThinking = true;
-                                    } else {
-                                        contentText += pendingText;
-                                        pendingText = '';
+                        while (i < data.length) {
+                            // Check for starting [THINKING] tag
+                            if (i < data.length - 9 && data.substring(i, i + 10) === '[THINKING]') {
+                                if (!inThinking) {
+                                    inThinking = true;
+                                    // Any accumulated content before thinking should be treated as pre-thinking content
+                                    if (contentText) {
+                                        preThinkingContent = contentText;
+                                        contentText = '';
                                     }
                                 }
-                            } else {
-                                pendingText = text;
+                                i += 10; // Skip the [THINKING] tag
+                                continue;
+                            }
+                            
+                            // Check for ending [/THINKING] tag
+                            if (i < data.length - 11 && data.substring(i, i + 12) === '[/THINKING]') {
+                                if (inThinking) {
+                                    inThinking = false;
+                                    // When ending thinking, the content after [/THINKING] should go to contentText
+                                    // and we should reset thinkingText for the next content
+                                }
+                                i += 12; // Skip the [/THINKING] tag
+                                continue;
+                            }
+                            
+                            // Regular character
+                            processedContent += data[i];
+                            i++;
+                        }
+                        
+                        if (inThinking) {
+                            // In thinking mode, accumulate to thinkingText
+                            thinkingText += processedContent;
+                            // Real-time rendering for thinking
+                            if (thinkingEl.querySelector('.thinking-content')) {
+                                // Remove any remaining tags for display
+                                let cleanThinkingText = thinkingText.replace(/\[\/?THINKING\]/g, '').replace(/^\s+/, '');
+                                thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + cleanThinkingText;
                             }
                         } else {
-                            const startIdx = text.indexOf('[THINKING]');
-                            if (startIdx !== -1) {
-                                contentText += text.substring(0, startIdx);
-                                pendingText = text.substring(startIdx + 10);
-                                inThinking = true;
-                            } else {
-                                contentText += text;
-                                pendingText = '';
-                            }
+                            // Not in thinking mode, accumulate to contentText
+                            contentText += processedContent;
+                            // Real-time rendering for content
+                            let renderText = contentText.replace(/^\s+/, '');
+                            // Remove any leftover tags
+                            renderText = renderText.replace(/\[\/?THINKING\]/g, '');
+                            contentEl.textContent = renderText;
                         }
                         
                         messagesArea.scrollTop = messagesArea.scrollHeight;
                     }
                 }
                 
-                // Handle remaining text
-                if (pendingText) {
-                    if (inThinking) {
-                        thinkingText += pendingText;
-                    } else {
-                        contentText += pendingText;
-                    }
-                }
+                // Final clean-up and rendering
+                // Clean up thinking text (removing any remaining tags)
+                thinkingText = thinkingText.replace(/\[\/?THINKING\]/g, '').replace(/^\s+/, '');
+                contentText = contentText.replace(/\[\/?THINKING\]/g, '').replace(/^\s+/, '');
                 
-                // Final render - only show content after thinking is complete
-                thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + thinkingText;
-                contentEl.textContent = contentText;
-                
-                // Hide thinking box if no thinking content
-                if (!thinkingText.trim()) {
+                // Final render - ensure correct display
+                if (thinkingText) {
+                    thinkingEl.querySelector('.thinking-content').textContent = '🤔 思考中...\n' + thinkingText;
+                } else {
                     thinkingEl.style.display = 'none';
                 }
+                
+                // Ensure final content text is displayed
+                // Clear any existing thinking box if it's not needed
+                if (!thinkingText.trim() && contentText.trim()) {
+                    // If there was no thinking, show the content in message area
+                    contentEl.textContent = contentText.trim();
+                } else if (thinkingText.trim() && contentText.trim()) {
+                    // Both thinking and content, show content in message area
+                    contentEl.textContent = contentText.trim();
+                }
+                // If there's only thinking and no final content, keep thinking as is
                 
             } catch (err) {
                 thinkingEl.style.display = 'none';

@@ -1,0 +1,194 @@
+INFO:     Will watch for changes in these directories: ['/Volumes/Seagate/workspace/code/my_ai_assistant/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [49848] using WatchFiles
+INFO:     Started server process [49863]
+INFO:     Waiting for application startup.
+2026-04-16 20:04:51,299 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:04:51,299 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2026-04-16 20:04:51,299 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("conversations")
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("messages")
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("knowledge_bases")
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-16 20:04:51,300 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     127.0.0.1:52226 - "GET /static/index.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52226 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+2026-04-16 20:06:39,697 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:06:39,700 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:06:39,700 INFO sqlalchemy.engine.Engine [generated in 0.00015s] (1,)
+2026-04-16 20:06:39,702 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-16 20:06:39,702 INFO sqlalchemy.engine.Engine [generated in 0.00014s] (1,)
+INFO:     127.0.0.1:52226 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-16 20:06:39,703 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52226 - "GET /static/index.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:52226 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+2026-04-16 20:06:41,945 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:06:41,946 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:06:41,946 INFO sqlalchemy.engine.Engine [cached since 2.246s ago] (1,)
+2026-04-16 20:06:41,957 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-16 20:06:41,970 INFO sqlalchemy.engine.Engine [cached since 2.268s ago] (1,)
+INFO:     127.0.0.1:52227 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-16 20:06:41,981 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-16 20:06:44,372 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:06:44,372 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:06:44,373 INFO sqlalchemy.engine.Engine [cached since 4.673s ago] (1,)
+2026-04-16 20:06:44,378 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-16 20:06:44,378 INFO sqlalchemy.engine.Engine [generated in 0.00043s] (1,)
+2026-04-16 20:06:44,382 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:06:44,382 INFO sqlalchemy.engine.Engine [generated in 0.00030s] (1, 'user', '你好')
+2026-04-16 20:06:44,429 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-16 20:06:44,431 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:06:44,432 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-16 20:06:44,432 INFO sqlalchemy.engine.Engine [generated in 0.00012s] (54,)
+2026-04-16 20:06:44,433 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-16 20:06:44,433 INFO sqlalchemy.engine.Engine [generated in 0.00007s] (1, 'system', 10, 0)
+INFO:     127.0.0.1:52227 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-16 20:08:44,484 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:08:44,531 INFO sqlalchemy.engine.Engine [cached since 120.1s ago] (1, 'assistant', 'Error: ')
+2026-04-16 20:08:44,535 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     127.0.0.1:53075 - "GET /static/index.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:53075 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+2026-04-16 20:09:34,461 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:09:34,462 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:09:34,462 INFO sqlalchemy.engine.Engine [cached since 174.8s ago] (1,)
+2026-04-16 20:09:34,462 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-16 20:09:34,462 INFO sqlalchemy.engine.Engine [cached since 174.8s ago] (1,)
+INFO:     127.0.0.1:53076 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-16 20:09:34,463 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-16 20:09:41,100 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:09:41,103 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.username = ?
+2026-04-16 20:09:41,103 INFO sqlalchemy.engine.Engine [generated in 0.00020s] ('test',)
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+INFO:     127.0.0.1:53109 - "POST /api/auth/login HTTP/1.1" 200 OK
+2026-04-16 20:09:41,310 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-16 20:09:41,314 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:09:41,314 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:09:41,314 INFO sqlalchemy.engine.Engine [cached since 181.6s ago] (1,)
+2026-04-16 20:09:41,315 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-16 20:09:41,315 INFO sqlalchemy.engine.Engine [cached since 181.6s ago] (1,)
+INFO:     127.0.0.1:53109 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-16 20:09:41,315 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-16 20:09:44,398 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:09:44,399 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:09:44,399 INFO sqlalchemy.engine.Engine [cached since 184.7s ago] (1,)
+2026-04-16 20:09:44,401 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-16 20:09:44,401 INFO sqlalchemy.engine.Engine [cached since 180s ago] (1,)
+2026-04-16 20:09:44,402 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:09:44,402 INFO sqlalchemy.engine.Engine [cached since 180s ago] (1, 'user', '你好')
+2026-04-16 20:09:44,449 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-16 20:09:44,452 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:09:44,452 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-16 20:09:44,452 INFO sqlalchemy.engine.Engine [cached since 180s ago] (56,)
+2026-04-16 20:09:44,453 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-16 20:09:44,453 INFO sqlalchemy.engine.Engine [cached since 180s ago] (1, 'system', 10, 0)
+INFO:     127.0.0.1:53109 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-16 20:12:31,687 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:12:31,687 INFO sqlalchemy.engine.Engine [cached since 347.3s ago] (1, 'assistant', '[THINKING]Okay[/THINKING][THINKING],[/THINKING][THINKING] the[/THINKING][THINKING] user[/THINKING][THINKING] just[/THINKING][THINKING] sent[/THINKING ... (52379 characters truncated) ... HINKING][THINKING] greet[/THINKING][THINKING] and[/THINKING][THINKING] offer[/THINKING][THINKING] help[/THINKING][THINKING].[/THINKING]你好！有什么可以帮您的吗？😊')
+2026-04-16 20:12:31,735 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-16 20:12:37,585 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:12:37,585 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:12:37,585 INFO sqlalchemy.engine.Engine [cached since 357.9s ago] (1,)
+2026-04-16 20:12:37,587 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-16 20:12:37,587 INFO sqlalchemy.engine.Engine [cached since 353.2s ago] (1,)
+2026-04-16 20:12:37,588 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:12:37,588 INFO sqlalchemy.engine.Engine [cached since 353.2s ago] (1, 'user', '你当真的是太啰嗦了，我就是问了你好，你直接回答就是了，为什么啰里八嗦的回答个没完没了，真的是烦死我了，好好回到就行可以吗？')
+2026-04-16 20:12:37,589 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-16 20:12:37,635 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:12:37,635 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-16 20:12:37,635 INFO sqlalchemy.engine.Engine [cached since 353.2s ago] (58,)
+2026-04-16 20:12:37,636 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-16 20:12:37,636 INFO sqlalchemy.engine.Engine [cached since 353.2s ago] (1, 'system', 10, 0)
+INFO:     127.0.0.1:53906 - "POST /api/chat/chat HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56366 - "GET /static/index.html HTTP/1.1" 304 Not Modified
+2026-04-16 20:22:02,661 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:56366 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+2026-04-16 20:22:02,669 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:22:02,670 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:22:02,670 INFO sqlalchemy.engine.Engine [cached since 923s ago] (1,)
+2026-04-16 20:22:02,671 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-16 20:22:02,671 INFO sqlalchemy.engine.Engine [cached since 923s ago] (1,)
+INFO:     127.0.0.1:56371 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-16 20:22:02,671 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-16 20:22:12,553 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:22:12,554 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-16 20:22:12,554 INFO sqlalchemy.engine.Engine [cached since 932.9s ago] (1,)
+2026-04-16 20:22:12,556 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-16 20:22:12,556 INFO sqlalchemy.engine.Engine [cached since 928.2s ago] (1,)
+2026-04-16 20:22:12,558 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:22:12,558 INFO sqlalchemy.engine.Engine [cached since 928.2s ago] (1, 'user', '你能查天气吗')
+2026-04-16 20:22:12,605 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-16 20:22:12,608 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-16 20:22:12,608 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-16 20:22:12,609 INFO sqlalchemy.engine.Engine [cached since 928.2s ago] (59,)
+2026-04-16 20:22:12,609 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-16 20:22:12,609 INFO sqlalchemy.engine.Engine [cached since 928.2s ago] (1, 'system', 10, 0)
+INFO:     127.0.0.1:56431 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-16 20:22:39,679 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-16 20:22:39,680 INFO sqlalchemy.engine.Engine [cached since 955.3s ago] (1, 'assistant', '[THINKING]用户[/THINKING][THINKING]问[/THINKING][THINKING]“[/THINKING][THINKING]你能[/THINKING][THINKING]查[/THINKING][THINKING]天气[/THINKING][THINKING]吗[/T ... (458 characters truncated) ... 具体的天气需求（比如某个城市的天气、出行建议等），可以告诉我，我会尽力提供有用的信息或建议！ 😊\n\n例如，你可以告诉我：\n- 想知道某个城市的天气（我会提供查询建议）\n- 需要了解天气对活动的影响（比如旅行、运动等）\n- 需要天气相关的科普知识\n\n请告诉我你的具体需求，我会尽力帮你！')
+2026-04-16 20:22:39,722 INFO sqlalchemy.engine.Engine COMMIT

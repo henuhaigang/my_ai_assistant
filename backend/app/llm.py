@@ -1,6 +1,6 @@
 import openai
 import httpx
-from typing import List, Dict, AsyncGenerator, Tuple
+from typing import List, Dict, AsyncGenerator
 from .config import settings
 
 if settings.LLM_PROVIDER == "openai":
@@ -39,13 +39,15 @@ async def generate_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str,
         else:
             yield "Unsupported LLM provider"
     except Exception as e:
-        yield f"Error: {str(e)}"
+        error_msg = str(e) if str(e) else "Unknown error occurred"
+        yield f"Error: {error_msg}"
 
 async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str, None]:
     base_url = settings.OLLAMA_BASE_URL.rstrip('/v1').rstrip('/')
     chat_url = f"{base_url}/api/chat"
     
     client = httpx.AsyncClient(timeout=120.0)
+    
     try:
         async with client.stream('POST', chat_url, json={
             "model": settings.OLLAMA_MODEL,
@@ -62,13 +64,19 @@ async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerat
                             thinking = msg.get('thinking', '')
                             content = msg.get('content', '')
                             
-                            # Output thinking content with tag
                             if thinking:
                                 yield f"[THINKING]{thinking}[/THINKING]"
-                            # Output regular content also with tag
                             if content:
                                 yield f"[MESSAGE]{content}[/MESSAGE]"
                     except json.JSONDecodeError:
                         continue
+    except httpx.ConnectError as e:
+        yield f"Error: 连接失败 - 无法连接到Ollama服务 {base_url}"
+    except httpx.TimeoutException as e:
+        yield f"Error: 请求超时 - Ollama服务响应时间过长"
+    except httpx.HTTPError as e:
+        yield f"Error: HTTP错误 - {str(e)}"
+    except Exception as e:
+        yield f"Error: {str(e) if str(e) else 'Unknown error'}"
     finally:
         await client.aclose()

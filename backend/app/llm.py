@@ -62,10 +62,12 @@ async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerat
                             thinking = msg.get('thinking', '')
                             content = msg.get('content', '')
                             
+                            # Output thinking content with tag
                             if thinking:
                                 yield f"[THINKING]{thinking}[/THINKING]"
+                            # Output regular content also with tag
                             if content:
-                                yield content
+                                yield f"[MESSAGE]{content}[/MESSAGE]"
                     except json.JSONDecodeError:
                         continue
     finally:

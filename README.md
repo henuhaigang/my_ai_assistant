@@ -104,6 +104,74 @@ backend/
 - `POST /api/knowledge/{kb_id}/upload` - Upload document to knowledge base
 - `GET /api/knowledge/list` - List user's knowledge bases
 
+## 中文文档
+
+### 项目结构
+
+```
+my_ai_assistant/
+├── docker-compose.yml      # Docker 编排配置
+├── frontend/
+│   └── index.html        # 简单聊天前端页面
+└── backend/
+    ├── Dockerfile
+    ├── requirements.txt
+    ├── .env.example
+    └── app/
+        ├── main.py           # FastAPI 应用入口
+        ├── config.py         # 配置管理
+        ├── database.py      # SQLAlchemy 异步数据库
+        ├── models.py       # 数据模型
+        ├── auth.py        # JWT 认证逻辑
+        ├── llm.py         # LLM 调用封装（OpenAI/通义千问）
+        ├── rag.py         # RAG 向量检索
+        ├── tools.py       # AI 工具（天气查询）
+        ├── redis_client.py
+        └── api/
+            ├── __init__.py
+            ├── auth.py      # 注册/登录接口
+            ├── user.py    # 当前用户信息
+            ├── chat.py    # 聊天/SSE流式响应
+            └── knowledge.py # 知识库管理（PDF上传）
+```
+
+### 技术栈
+
+| 层级 | 技术 |
+|------|------|
+| **Web框架** | FastAPI + Uvicorn |
+| **数据库** | PostgreSQL (asyncpg) + Redis |
+| **ORM** | SQLAlchemy 2.0 (异步) |
+| **认证** | JWT (python-jose) + bcrypt |
+| **AI/LLM** | OpenAI GPT-3.5 / 阿里通义千问 |
+| **向量库** | ChromaDB + LangChain |
+| **PDF解析** | PyPDF2 |
+
+### Docker 部署
+
+```bash
+docker-compose up --build
+```
+
+服务端口：
+- **Backend**: `http://localhost:8000`
+- **PostgreSQL**: `localhost:5432`
+- **Redis**: `localhost:6379`
+
+### 配置说明
+
+在 `backend/.env` 中配置以下环境变量：
+
+```env
+SECRET_KEY=your-secret-key
+DATABASE_URL=postgresql+asyncpg://postgres:password@db:5432/aiassistant
+REDIS_URL=redis://redis:6379/0
+OPENAI_API_KEY=your-openai-api-key
+LLM_PROVIDER=openai  # 或 dashscope, ollama
+DASHSCOPE_API_KEY=your-dashscope-api-key
+WEATHER_API_KEY=your-weather-api-key
+```
+
 ## License
 
 This project is licensed under the MIT License.

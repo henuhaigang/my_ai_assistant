@@ -79,6 +79,39 @@
         </div>
     </div>
     
-    <script src="/static/script.js"></script>
-</body>
+    
+<div class="file-upload-section">
+        <div class="section-header">
+            <h3>📁 文件上传与分析</h3>
+            
+<button onclick="showSupportedFormats()">查看支持的格式</button>
+        </div>
+
+<script src="/static/script.js"></script>
+    <!-- File Upload Modal -->
+    <div id="supported-formats-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="hideModal('supported-formats-modal')">&times;</span>
+            
+<h2>支持的文件格式</h2>
+
+<div class="format-list">
+
+<li>.pdf - PDF文档（可读取所有页面文本内容）<br><small>Portable Document Format，支持多页提取和全文检索。</small></li>
+
+
+<li>.docx, .doc - Word文档<br><small>Microsoft Word 文档。自动统计段落数、单词数量等元数据信息。</small></li>
+
+</div>
+        </div>
+    </div>
+
+<script src="/static/script.js"></script>
+    
+<div class="file-upload-section">
+            <h3>📁 文件上传与分析系统</h3><br>
+            
+<label for="kbName">知识库名称（可选）:</label><input type="text" id="kbName" placeholder="例如: my_analysis_kb"><br>
+
+<button onclick="analyzeFile()">分析并存储到向量库</button></div>
 </html>

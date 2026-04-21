@@ -10,12 +10,13 @@ An AI assistant application with chat, knowledge base, and RAG capabilities buil
   - Context preservation in conversations
   - System prompt support
 
+- **File Analysis & Upload**:
+  - Support for multiple file formats (PDF, Word documents, Excel spreadsheets, plain text)
+  - Automatic content extraction and analysis
+  - Direct upload with optional knowledge base storage
+  - File metadata collection (size, type, page count, etc.)
+  
 - **Knowledge Base Management**:
-  - Create and manage knowledge bases
-  - Document upload (PDF and text files)
-  - Vector-based retrieval using ChromaDB
-
-- **RAG (Retrieval-Augmented Generation)**:
   - Document embedding and storage
   - Vector-based document search
   - Context-aware responses
@@ -99,9 +100,11 @@ backend/
 - `GET /api/chat/conversations/{conv_id}/messages` - Get conversation messages
 - `POST /api/chat/chat` - Send message and get streaming response
 
-### Knowledge Base
+### File Analysis & Knowledge Base
+- `POST /api/knowledge/analyze` - Analyze uploaded file and extract content (supports PDF, Word, Excel, text files)
+- `GET /api/knowledge/supported-formats` - Get list of supported file formats with descriptions
 - `POST /api/knowledge/create` - Create knowledge base
-- `POST /api/knowledge/{kb_id}/upload` - Upload document to knowledge base
+- `POST /api/knowledge/{kb_id}/upload` - Upload document to specific knowledge base
 - `GET /api/knowledge/list` - List user's knowledge bases
 
 ## 中文文档
@@ -145,7 +148,7 @@ my_ai_assistant/
 | **认证** | JWT (python-jose) + bcrypt |
 | **AI/LLM** | OpenAI GPT-3.5 / 阿里通义千问 |
 | **向量库** | ChromaDB + LangChain |
-| **PDF解析** | PyPDF2 |
+| **PDF解析** | PyPDF2, python-docx, openpyxl |
 
 ### Docker 部署
 

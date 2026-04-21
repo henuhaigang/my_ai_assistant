@@ -1,0 +1,389 @@
+INFO:     Will watch for changes in these directories: ['/Volumes/Seagate/workspace/code/my_ai_assistant/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [60628] using WatchFiles
+INFO:     Started server process [60642]
+INFO:     Waiting for application startup.
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("users")
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("conversations")
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("messages")
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine PRAGMA main.table_info("knowledge_bases")
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-17 16:08:00,378 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Application startup complete.
+INFO:     127.0.0.1:62837 - "GET /static/script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62984 - "GET /static/index.html HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:62984 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62985 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62984 - "GET /static/script.js HTTP/1.1" 200 OK
+2026-04-17 16:08:45,630 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 16:08:45,632 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 16:08:45,632 INFO sqlalchemy.engine.Engine [generated in 0.00012s] (2,)
+2026-04-17 16:08:45,634 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-17 16:08:45,634 INFO sqlalchemy.engine.Engine [generated in 0.00008s] (2,)
+INFO:     127.0.0.1:62984 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-17 16:08:45,635 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-17 16:08:49,002 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 16:08:49,002 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 16:08:49,002 INFO sqlalchemy.engine.Engine [cached since 3.37s ago] (2,)
+2026-04-17 16:08:49,008 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-17 16:08:49,008 INFO sqlalchemy.engine.Engine [generated in 0.00026s] (3,)
+2026-04-17 16:08:49,014 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 16:08:49,014 INFO sqlalchemy.engine.Engine [generated in 0.00020s] (3, 'user', '朋友')
+2026-04-17 16:08:49,015 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 16:08:49,061 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 16:08:49,061 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-17 16:08:49,061 INFO sqlalchemy.engine.Engine [generated in 0.00009s] (121,)
+2026-04-17 16:08:49,062 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-17 16:08:49,062 INFO sqlalchemy.engine.Engine [generated in 0.00007s] (3, 'system', 10, 0)
+INFO:     127.0.0.1:62984 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-17 16:09:48,209 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 16:09:48,209 INFO sqlalchemy.engine.Engine [cached since 59.2s ago] (3, 'assistant', '[THINKING]Thinking[/THINKING][THINKING] Process[/THINKING][THINKING]:[/THINKING][THINKING]\n\n1[/THINKING][THINKING].[/THINKING][THINKING]  **[/THINK ... (24530 characters truncated) ... AGE][MESSAGE]好朋友[/MESSAGE][MESSAGE]！[/MESSAGE][MESSAGE]随时[/MESSAGE][MESSAGE]找我[/MESSAGE][MESSAGE]哦[/MESSAGE][MESSAGE]～[/MESSAGE][MESSAGE] 😊[/MESSAGE]')
+2026-04-17 16:09:48,252 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     127.0.0.1:51971 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51994 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52109 - "GET /static/index.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52123 - "GET /static/script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52150 - "GET /static/style.css HTTP/1.1" 200 OK
+2026-04-17 21:45:25,663 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:45:25,664 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.username = ?
+2026-04-17 21:45:25,664 INFO sqlalchemy.engine.Engine [generated in 0.00021s] ('testuser',)
+(trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2026-04-17 21:45:25,861 INFO sqlalchemy.engine.Engine INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:45:25,861 INFO sqlalchemy.engine.Engine [generated in 0.00013s] ('testuser', 'test@example.com', '$2b$12$QULbtL4Mbul4i7fEkKNK2eOe9LV.epsLaxAhGOJR/4uXYwdqSNgk2')
+2026-04-17 21:45:25,866 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52171 - "POST /api/auth/register HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 182, in execute
+    self._adapt_connection._handle_exception(error)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 342, in _handle_exception
+    raise error
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 164, in execute
+    self.await_(_cursor.execute(operation, parameters))
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+             ^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: users.email
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 420, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/applications.py", line 90, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+    await route.handle(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/routing.py", line 276, in handle
+    await self.app(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/routing.py", line 134, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/routing.py", line 120, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/routing.py", line 674, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/fastapi/routing.py", line 328, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Volumes/Seagate/workspace/code/my_ai_assistant/backend/app/api/auth.py", line 29, in register
+    await db.commit()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 1000, in commit
+    await greenlet_spawn(self.sync_session.commit)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 203, in greenlet_spawn
+    result = context.switch(value)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2030, in commit
+    trans.commit(_to_root=True)
+  File "<string>", line 2, in commit
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1311, in commit
+    self._prepare_impl()
+  File "<string>", line 2, in _prepare_impl
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 1286, in _prepare_impl
+    self.session.flush()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4331, in flush
+    self._flush(objects)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4466, in _flush
+    with util.safe_reraise():
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 121, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4427, in _flush
+    flush_context.execute()
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 466, in execute
+    rec.execute(self)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 642, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 93, in save_obj
+    _emit_insert_statements(
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1233, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 182, in execute
+    self._adapt_connection._handle_exception(error)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 342, in _handle_exception
+    raise error
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/dialects/sqlite/aiosqlite.py", line 164, in execute
+    self.await_(_cursor.execute(operation, parameters))
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/cursor.py", line 40, in execute
+    await self._execute(self._cursor.execute, sql, parameters)
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/cursor.py", line 32, in _execute
+    return await self._conn._execute(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 160, in _execute
+    return await future
+           ^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/site-packages/aiosqlite/core.py", line 63, in _connection_worker_thread
+    result = function()
+             ^^^^^^^^^^
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: users.email
+[SQL: INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?) RETURNING id, created_at]
+[parameters: ('testuser', 'test@example.com', '$2b$12$QULbtL4Mbul4i7fEkKNK2eOe9LV.epsLaxAhGOJR/4uXYwdqSNgk2')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2026-04-17 21:45:30,341 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:45:30,341 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.username = ?
+2026-04-17 21:45:30,341 INFO sqlalchemy.engine.Engine [cached since 4.677s ago] ('admin',)
+2026-04-17 21:45:30,342 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52198 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52469 - "GET /static/script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52489 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52663 - "GET /static/index.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52665 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52663 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52665 - "GET /static/script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52663 - "GET /api/chat/conversations HTTP/1.1" 401 Unauthorized
+2026-04-17 21:47:14,254 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:14,255 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.username = ?
+2026-04-17 21:47:14,255 INFO sqlalchemy.engine.Engine [cached since 108.6s ago] ('test',)
+INFO:     127.0.0.1:52711 - "POST /api/auth/login HTTP/1.1" 200 OK
+2026-04-17 21:47:14,479 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-17 21:47:14,483 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:14,483 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:47:14,483 INFO sqlalchemy.engine.Engine [cached since 8586s ago] (1,)
+2026-04-17 21:47:14,484 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-17 21:47:14,484 INFO sqlalchemy.engine.Engine [cached since 8586s ago] (1,)
+INFO:     127.0.0.1:52711 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-17 21:47:14,484 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:52748 - "GET /static/index.html HTTP/1.1" 304 Not Modified
+2026-04-17 21:47:21,341 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:21,341 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:47:21,341 INFO sqlalchemy.engine.Engine [cached since 8593s ago] (1,)
+INFO:     127.0.0.1:52750 - "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 Not Found
+2026-04-17 21:47:21,343 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.user_id = ? ORDER BY conversations.updated_at DESC
+2026-04-17 21:47:21,343 INFO sqlalchemy.engine.Engine [cached since 8593s ago] (1,)
+INFO:     127.0.0.1:52748 - "GET /api/chat/conversations HTTP/1.1" 200 OK
+2026-04-17 21:47:21,344 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-17 21:47:29,423 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:29,424 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:47:29,424 INFO sqlalchemy.engine.Engine [cached since 8601s ago] (1,)
+2026-04-17 21:47:29,471 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-17 21:47:29,471 INFO sqlalchemy.engine.Engine [cached since 8597s ago] (1,)
+2026-04-17 21:47:29,472 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:47:29,472 INFO sqlalchemy.engine.Engine [cached since 8597s ago] (1, 'user', 'hello，我的好朋友')
+2026-04-17 21:47:29,473 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:47:29,476 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:29,476 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-17 21:47:29,476 INFO sqlalchemy.engine.Engine [cached since 8597s ago] (123,)
+2026-04-17 21:47:29,477 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-17 21:47:29,477 INFO sqlalchemy.engine.Engine [cached since 8597s ago] (1, 'system', 10, 0)
+INFO:     127.0.0.1:52789 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-17 21:47:29,499 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:47:29,499 INFO sqlalchemy.engine.Engine [cached since 8597s ago] (1, 'assistant', 'Error: All connection attempts failed')
+2026-04-17 21:47:29,500 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:47:50,110 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:50,111 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:47:50,111 INFO sqlalchemy.engine.Engine [cached since 8621s ago] (1,)
+2026-04-17 21:47:50,113 INFO sqlalchemy.engine.Engine SELECT conversations.id AS conversations_id, conversations.user_id AS conversations_user_id, conversations.title AS conversations_title, conversations.created_at AS conversations_created_at, conversations.updated_at AS conversations_updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-17 21:47:50,113 INFO sqlalchemy.engine.Engine [cached since 8618s ago] (1,)
+2026-04-17 21:47:50,114 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:47:50,114 INFO sqlalchemy.engine.Engine [cached since 8618s ago] (1, 'user', '你好，我的好朋友')
+2026-04-17 21:47:50,156 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:47:50,161 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:47:50,161 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-17 21:47:50,161 INFO sqlalchemy.engine.Engine [cached since 8618s ago] (125,)
+2026-04-17 21:47:50,162 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-17 21:47:50,162 INFO sqlalchemy.engine.Engine [cached since 8618s ago] (1, 'system', 10, 0)
+INFO:     127.0.0.1:52893 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-17 21:47:50,180 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:47:50,180 INFO sqlalchemy.engine.Engine [cached since 8618s ago] (1, 'assistant', 'Error: All connection attempts failed')
+2026-04-17 21:47:50,181 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:49:15,312 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:49:15,314 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.username = ?
+2026-04-17 21:49:15,314 INFO sqlalchemy.engine.Engine [cached since 229.6s ago] ('testuser123',)
+2026-04-17 21:49:15,517 INFO sqlalchemy.engine.Engine INSERT INTO users (username, email, hashed_password) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:49:15,517 INFO sqlalchemy.engine.Engine [cached since 229.7s ago] ('testuser123', 'test123@example.com', '$2b$12$.4Jphee7/tuuJVzFLxweRe/C.MvnddDlF5fcbSrxfdvFk5lrhHiuK')
+2026-04-17 21:49:15,519 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:49:15,521 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:49:15,521 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:49:15,521 INFO sqlalchemy.engine.Engine [generated in 0.00006s] (3,)
+INFO:     127.0.0.1:53330 - "POST /api/auth/register HTTP/1.1" 200 OK
+2026-04-17 21:49:15,522 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-04-17 21:49:19,974 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:49:19,974 INFO sqlalchemy.engine.Engine SELECT users.id, users.username, users.email, users.hashed_password, users.created_at 
+FROM users 
+WHERE users.id = ?
+2026-04-17 21:49:19,975 INFO sqlalchemy.engine.Engine [cached since 8711s ago] (3,)
+2026-04-17 21:49:19,977 INFO sqlalchemy.engine.Engine INSERT INTO conversations (user_id, title, updated_at) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:49:19,977 INFO sqlalchemy.engine.Engine [generated in 0.00040s] (3, '你好', None)
+2026-04-17 21:49:20,024 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:49:20,026 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:49:20,026 INFO sqlalchemy.engine.Engine SELECT conversations.id, conversations.user_id, conversations.title, conversations.created_at, conversations.updated_at 
+FROM conversations 
+WHERE conversations.id = ?
+2026-04-17 21:49:20,026 INFO sqlalchemy.engine.Engine [generated in 0.00007s] (13,)
+2026-04-17 21:49:20,027 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:49:20,027 INFO sqlalchemy.engine.Engine [cached since 8708s ago] (13, 'user', '你好')
+2026-04-17 21:49:20,027 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-17 21:49:20,029 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-17 21:49:20,029 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.id = ?
+2026-04-17 21:49:20,029 INFO sqlalchemy.engine.Engine [cached since 8708s ago] (127,)
+2026-04-17 21:49:20,029 INFO sqlalchemy.engine.Engine SELECT messages.id, messages.conversation_id, messages.role, messages.content, messages.created_at 
+FROM messages 
+WHERE messages.conversation_id = ? AND messages.role != ? ORDER BY messages.created_at DESC
+ LIMIT ? OFFSET ?
+2026-04-17 21:49:20,029 INFO sqlalchemy.engine.Engine [cached since 8708s ago] (13, 'system', 10, 0)
+INFO:     127.0.0.1:53350 - "POST /api/chat/chat HTTP/1.1" 200 OK
+2026-04-17 21:49:20,047 INFO sqlalchemy.engine.Engine INSERT INTO messages (conversation_id, role, content) VALUES (?, ?, ?) RETURNING id, created_at
+2026-04-17 21:49:20,047 INFO sqlalchemy.engine.Engine [cached since 8708s ago] (13, 'assistant', 'Error: All connection attempts failed')
+2026-04-17 21:49:20,048 INFO sqlalchemy.engine.Engine COMMIT
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [60642]
+INFO:     Stopping reloader process [60628]

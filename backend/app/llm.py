@@ -1,4 +1,5 @@
 import openai
+import httpx
 from typing import List, Dict, AsyncGenerator
 from .config import settings
 
@@ -32,7 +33,50 @@ async def generate_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str,
             async for chunk in response:
                 if chunk.output.choices[0].message.content:
                     yield chunk.output.choices[0].message.content
+        elif settings.LLM_PROVIDER == "ollama":
+            async for token in generate_ollama_stream(messages):
+                yield token
         else:
             yield "Unsupported LLM provider"
     except Exception as e:
-        yield f"Error: {str(e)}"
+        error_msg = str(e) if str(e) else "Unknown error occurred"
+        yield f"Error: {error_msg}"
+
+async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str, None]:
+    base_url = settings.OLLAMA_BASE_URL.rstrip('/v1').rstrip('/')
+    chat_url = f"{base_url}/api/chat"
+    
+    client = httpx.AsyncClient(timeout=120.0)
+    
+    try:
+        async with client.stream('POST', chat_url, json={
+            "model": settings.OLLAMA_MODEL,
+            "messages": messages,
+            "stream": True
+        }) as response:
+            async for line in response.aiter_lines():
+                if line.strip():
+                    import json
+                    try:
+                        data = json.loads(line)
+                        if 'message' in data:
+                            msg = data['message']
+                            thinking = msg.get('thinking', '')
+                            content = msg.get('content', '')
+                            
+                            if thinking:
+                                yield f"[THINKING]{thinking}[/THINKING]"
+                            if content:
+                                yield f"[MESSAGE]{content}[/MESSAGE]"
+                    except json.JSONDecodeError:
+                        continue
+    except httpx.ConnectError as e:
+        yield f"Error: 连接失败 - 无法连接到Ollama服务 {base_url}"
+    except httpx.TimeoutException as e:
+        yield f"Error: 请求超时 - Ollama服务响应时间过长"
+    except httpx.HTTPError as e:
+        yield f"Error: HTTP错误 - {str(e)}"
+    except Exception as e:
+        yield f"Error: {str(e) if str(e) else 'Unknown error'}"
+    finally:
+        await client.aclose()

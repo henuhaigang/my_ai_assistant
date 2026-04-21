@@ -1,0 +1,12 @@
+{
+  "name": "ai-assistant-frontend",
+  "version": "1.0.0",
+  "description": "AI Assistant Frontend",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

@@ -33,3 +33,16 @@ class KnowledgeBase(Base):
     name = Column(String(200))
     description = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UploadedFile(Base):
+    __tablename__ = "uploaded_files"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    filename = Column(String(255))
+    file_path = Column(String(500))
+    content_type = Column(String(100))
+    size_bytes = Column(Integer)
+    file_metadata = Column(JSON, nullable=True)
+    summary = Column(Text, nullable=True)  # 文件内容摘要
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

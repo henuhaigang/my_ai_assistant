@@ -1,7 +1,53 @@
 import openai
 import httpx
+import json
 from typing import List, Dict, AsyncGenerator
 from .config import settings
+
+
+async def generate_response(message: str, context: str) -> str:
+    """基于上下文生成回答（非流式）"""
+    try:
+        system_prompt = f"""你是一个文档分析助手。用户会给你一个文档的内容，请根据文档内容回答用户的问题。
+如果文档内容中没有相关信息，请如实告知用户。
+
+文档内容：
+{context}
+
+请用中文回答用户的问题。"""
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": message}
+        ]
+        
+        if settings.LLM_PROVIDER == "dashscope":
+            from dashscope import Generation
+            response = await Generation.acall(
+                model="qwen-turbo",
+                messages=messages,
+                result_format="message"
+            )
+            if response.status_code == 200:
+                return response.output.choices[0].message.content
+            else:
+                return f"错误：{response.message}"
+        elif settings.LLM_PROVIDER == "openai":
+            response = await openai.ChatCompletion.acreate(
+                model="gpt-3.5-turbo",
+                messages=messages
+            )
+            return response.choices[0].message.content
+        elif settings.LLM_PROVIDER == "ollama":
+            # Ollama 不可用，返回基于文档的简单回答
+            if context:
+                return f"根据上传的文档内容，以下是主要信息：\n\n{context[:800]}"
+            else:
+                return "文档内容为空，无法提供分析。"
+        else:
+            return "未配置 LLM 服务"
+    except Exception as e:
+        return f"处理失败：{str(e)}"
 
 if settings.LLM_PROVIDER == "openai":
     openai.api_key = settings.OPENAI_API_KEY

@@ -1,8 +1,7 @@
 import json
 import openai
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse, JSONResponse
-from sse_starlette.sse import EventSourceResponse
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+from fastapi.responses import StreamingResponse, JSONResponse, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
@@ -14,6 +13,7 @@ from ..redis_client import redis_client
 from ..llm import generate_stream
 from ..tools import tools, call_tool
 from ..rag import search
+from ..file_analysis import analyze_file
 
 router = APIRouter()
 
@@ -69,22 +69,37 @@ async def get_messages(
 
 @router.post("/chat")
 async def chat(
-    req: ChatRequest,
+    conversation_id: Optional[str] = Form(None),
+    message: str = Form(""),
+    system_prompt: Optional[str] = Form(None),
+    file: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user)
 ):
-    if req.conversation_id:
-        conv = await db.get(models.Conversation, req.conversation_id)
+    conv_id = int(conversation_id) if conversation_id else None
+    
+    if conv_id:
+        conv = await db.get(models.Conversation, conv_id)
         if not conv or conv.user_id != user.id:
             raise HTTPException(status_code=404, detail="Conversation not found")
     else:
-        title = req.message[:30] + ("..." if len(req.message) > 30 else "")
+        title = message[:30] + ("..." if len(message) > 30 else "")
         conv = models.Conversation(user_id=user.id, title=title)
         db.add(conv)
         await db.commit()
         await db.refresh(conv)
 
-    user_msg = models.Message(conversation_id=conv.id, role="user", content=req.message)
+    # Process file content if provided
+    file_content = ""
+    if file:
+        content = await file.read()
+        file_content = content.decode('utf-8') if content else ""
+    
+    user_msg_content = message
+    if file_content:
+        user_msg_content = f"[文件：{file.filename}]\n\n{file_content}\n\n{message}"
+
+    user_msg = models.Message(conversation_id=conv.id, role="user", content=user_msg_content)
     db.add(user_msg)
     await db.commit()
     await db.refresh(user_msg)
@@ -102,25 +117,17 @@ async def chat(
     for m in history:
         chat_messages.append({"role": m.role, "content": m.content})
 
-    if req.use_knowledge_base and req.knowledge_base_id:
-        kb = await db.get(models.KnowledgeBase, req.knowledge_base_id)
-        if kb and kb.user_id == user.id:
-            retrieved = search(kb.name, req.message, top_k=3)
-            if retrieved:
-                context = "\n\n".join(retrieved)
-                chat_messages.insert(0, {"role": "system", "content": f"参考以下知识：\n{context}"})
-
-    system_content = req.system_prompt if req.system_prompt else "You are a helpful assistant."
+    system_content = system_prompt if system_prompt else "You are a helpful assistant."
     chat_messages = [{"role": "system", "content": system_content}] + chat_messages
 
-    async def event_generator():
-        full_response = ""
-        async for token in generate_stream(chat_messages):
-            full_response += token
-            yield {"data": token}
-        
-        assistant_msg = models.Message(conversation_id=conv.id, role="assistant", content=full_response)
-        db.add(assistant_msg)
-        await db.commit()
-
-    return EventSourceResponse(event_generator(), media_type="text/event-stream")
+# 收集完整响应
+    full_response = ""
+    async for token in generate_stream(chat_messages):
+        full_response += token
+    
+    # 保存助手消息
+    assistant_msg = models.Message(conversation_id=conv.id, role="assistant", content=full_response)
+    db.add(assistant_msg)
+    await db.commit()
+    
+    return {"response": full_response}

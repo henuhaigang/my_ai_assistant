@@ -3,115 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Assistant</title>
+    <title>AI 助手 - 文档分析</title>
     <link rel="stylesheet" href="/static/style.css">
-    <!-- Markdown渲染和语法高亮 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/java.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/javascript.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/python.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/cpp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/c.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/typescript.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/go.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/rust.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/swift.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/languages/kotlin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- Login Screen -->
+    <!-- 登录页面 -->
     <div id="login-container" class="login-container">
         <div class="login-box">
-            <h1>AI Assistant</h1>
-            <p>智能对话助手，随时为您效劳</p>
+            <div class="login-icon">
+                <svg viewBox="0 0 64 64" width="64" height="64">
+                    <circle cx="32" cy="32" r="30" fill="#3B82F6"/>
+                    <path d="M20 44 L32 20 L44 44" stroke="white" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <h1>AI 助手</h1>
+            <p>智能文档分析与对话</p>
             <input type="text" id="username" placeholder="用户名" onkeypress="handleLoginKeyPress(event)">
             <input type="password" id="password" placeholder="密码" onkeypress="handleLoginKeyPress(event)">
-            <button onclick="login()">登录</button>
+            <button class="login-btn" onclick="login()">登录</button>
         </div>
     </div>
-    
-    <!-- Chat Screen -->
+
+    <!-- 聊天主界面 -->
     <div id="chat-container" class="chat-container">
+        <!-- 顶部导航 -->
         <div class="chat-header">
-            <div class="chat-header-left">
-                <div class="chat-header-avatar">AI</div>
-                <div class="chat-header-info">
-                    <h2>AI 助手</h2>
-                    <span>在线</span>
+            <div class="header-left">
+                <div class="logo">
+                    <svg viewBox="0 0 32 32" width="32" height="32">
+                        <circle cx="16" cy="16" r="14" fill="#3B82F6"/>
+                        <path d="M10 22 L16 10 L22 22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </div>
+                <span class="logo-text">AI 助手</span>
             </div>
-            <button class="logout-btn" onclick="logout()">退出登录</button>
-        </div>
-        
-        <div class="system-prompt-section">
-            <div class="system-prompt-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                System Prompt (可选)
+            <div class="header-right">
+                <button class="icon-btn" onclick="logout()" title="退出登录">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
             </div>
-            <input type="text" class="system-prompt-input" id="system-prompt" placeholder="设置 AI 助手的角色和行为..." value="You are a helpful assistant.">
         </div>
-        
+
+        <!-- 消息区域 -->
         <div class="messages-area" id="messages-area">
             <div class="welcome-message">
-                <h2>👋 欢迎使用 AI 助手</h2>
-                <p>我是您的智能对话助手，可以回答问题、编写代码、创作内容等。有什么我可以帮您的吗？</p>
+                <div class="welcome-icon">
+                    <svg viewBox="0 0 80 80" width="80" height="80">
+                        <circle cx="40" cy="40" r="36" fill="#3B82F6" opacity="0.1"/>
+                        <circle cx="40" cy="40" r="24" fill="#3B82F6" opacity="0.2"/>
+                        <path d="M28 48 L40 28 L52 48" stroke="#3B82F6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2>你��，我是 AI 助手</h2>
+                <p>我可以帮助你分析文档内容。请先上传文件，然后我会提取内容，你可以问我任何关于文档的问题。</p>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-icon">📄</span>
+                        <span>支持 PDF、Word、TXT 文档</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <span>智能问答互动</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📝</span>
+                        <span>内容摘要总结</span>
+                    </div>
+                </div>
             </div>
         </div>
-        
+
+        <!-- 底部输入区 -->
         <div class="input-area">
-            <div class="input-container">
-                <div class="input-wrapper">
-                    <textarea id="input" rows="1" placeholder="输入消息..." onkeydown="handleKeyDown(event)"></textarea>
+            <!-- 文件预览区域 -->
+            <div class="file-preview" id="file-preview" style="display: none;">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                    </div>
+                    <span class="file-name" id="file-name">document.pdf</span>
+                    <span class="file-size" id="file-size">1.2 MB</span>
                 </div>
-                <button class="send-btn" id="send-btn" onclick="sendMessage()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                <button class="remove-btn" onclick="removeFile()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 上传进度 -->
+            <div class="upload-progress" id="upload-progress" style="display: none;">
+                <div class="progress-ring">
+                    <svg viewBox="0 0 100 100" class="progress-svg">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#E5E7EB" stroke-width="6"/>
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#3B82F6" stroke-width="6"
+                                stroke-dasharray="251.2" stroke-dashoffset="251.2" class="progress-circle" transform="rotate(-90 50 50)"/>
+                    </svg>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+                <span class="progress-label">正在上传...</span>
+            </div>
+
+            <!-- 等待分析结果 -->
+            <div class="waiting-analysis" id="waiting-analysis" style="display: none;">
+                <div class="spinner"></div>
+                <span>正在提取文档内容...</span>
+            </div>
+
+            <!-- 输入框 -->
+            <div class="input-row">
+                <label class="attach-btn" for="file-input">
+                    <input type="file" id="file-input" class="file-hidden" accept=".pdf,.docx,.doc,.txt,.md">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                </label>
+                <textarea id="input" class="chat-input" placeholder="请先上传文件..." rows="1" disabled></textarea>
+                <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                     </svg>
                 </button>
             </div>
         </div>
     </div>
-    
-    
-<div class="file-upload-section">
-        <div class="section-header">
-            <h3>📁 文件上传与分析</h3>
-            
-<button onclick="showSupportedFormats()">查看支持的格式</button>
-        </div>
 
-<script src="/static/script.js"></script>
-    <!-- File Upload Modal -->
-    <div id="supported-formats-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-btn" onclick="hideModal('supported-formats-modal')">&times;</span>
-            
-<h2>支持的文件格式</h2>
-
-<div class="format-list">
-
-<li>.pdf - PDF文档（可读取所有页面文本内容）<br><small>Portable Document Format，支持多页提取和全文检索。</small></li>
-
-
-<li>.docx, .doc - Word文档<br><small>Microsoft Word 文档。自动统计段落数、单词数量等元数据信息。</small></li>
-
-</div>
-        </div>
-    </div>
-
-<script src="/static/script.js"></script>
-    
-<div class="file-upload-section">
-            <h3>📁 文件上传与分析系统</h3><br>
-            
-<label for="kbName">知识库名称（可选）:</label><input type="text" id="kbName" placeholder="例如: my_analysis_kb"><br>
-
-<button onclick="analyzeFile()">分析并存储到向量库</button></div>
+    <script src="/static/script.js"></script>
+</body>
 </html>

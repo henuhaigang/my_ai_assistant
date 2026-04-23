@@ -1,5 +1,6 @@
 import os
 import uuid
+import re
 from typing import Optional
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Depends
 from fastapi.responses import JSONResponse
@@ -10,6 +11,11 @@ from ..models import UploadedFile, User
 from ..auth import get_current_user
 
 router = APIRouter()
+
+def clean_llm_response(text: str) -> str:
+    text = re.sub(r'\[THINKING\][\s\S]*?\[/THINKING\]', '', text)
+    text = text.replace('[MESSAGE]', '').replace('[/MESSAGE]', '')
+    return text
 
 # 存储文件信息（进程内存）
 session_files = {}
@@ -179,5 +185,6 @@ async def chat_with_file(
         response = await generate_response(message, summary)
     except Exception as e:
         response = f"处理失败：{str(e)}"
-    
-    return {"response": response, "file": target_filename, "matched": True}
+
+    cleaned = clean_llm_response(response)
+    return {"response": cleaned, "file": target_filename, "matched": True}

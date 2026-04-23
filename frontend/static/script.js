@@ -6,6 +6,9 @@ var isUploading = false;
 var isAnalyzing = false;
 var isLoading = false;
 var hasFile = sessionStorage.getItem('hasFileUploaded') === 'true';
+// 对话管理
+var currentConversationId = null;
+var conversations = [];
 
 // 配置 marked
 if (typeof marked !== 'undefined') {
@@ -40,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('chat-container').style.display = 'flex';
         setInputEnabled(true);
+        loadConversations();
     }
 });
 
@@ -67,6 +71,7 @@ function login() {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('chat-container').style.display = 'flex';
         setInputEnabled(true);
+        loadConversations();
     })
     .catch(function(err) { alert('登录失败'); });
 }
@@ -74,6 +79,104 @@ function login() {
 function logout() {
     localStorage.removeItem('token');
     location.reload();
+}
+
+// 加载对话列表
+async function loadConversations() {
+    try {
+        var res = await fetch('/api/chat/conversations', {
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        if (!res.ok) return;
+        conversations = await res.json();
+        renderConversationList();
+    } catch (e) {
+        console.error('加载对话列表失败:', e);
+    }
+}
+
+// 渲染侧边栏对话列表
+function renderConversationList() {
+    var listEl = document.getElementById('conversation-list');
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    conversations.forEach(function(conv) {
+        var item = document.createElement('div');
+        item.className = 'conversation-item' + (conv.id === currentConversationId ? ' active' : '');
+        item.onclick = function() { selectConversation(conv.id); };
+
+        var titleEl = document.createElement('span');
+        titleEl.className = 'conversation-title';
+        titleEl.textContent = conv.title || '新对话';
+        titleEl.onclick = function(e) { e.stopPropagation(); selectConversation(conv.id); };
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.className = 'conversation-item-delete';
+        deleteBtn.innerHTML = '&times;';
+        deleteBtn.title = '删除对话';
+        deleteBtn.onclick = function(e) { e.stopPropagation(); deleteConversation(conv.id); };
+
+        item.appendChild(titleEl);
+        item.appendChild(deleteBtn);
+        listEl.appendChild(item);
+    });
+}
+
+// 选择对话
+async function selectConversation(convId) {
+    currentConversationId = convId;
+    renderConversationList();
+    clearMessagesArea();
+    
+    try {
+        var res = await fetch('/api/chat/conversations/' + convId + '/messages', {
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        if (!res.ok) return;
+        var messages = await res.json();
+        messages.forEach(function(msg) {
+            addMessage(msg.role, msg.content);
+        });
+    } catch (e) {
+        console.error('加载消息失败:', e);
+    }
+}
+
+// 新建对话
+function newConversation() {
+    currentConversationId = null;
+    renderConversationList();
+    clearMessagesArea();
+}
+
+// 删除对话
+async function deleteConversation(convId) {
+    if (!confirm('确定要删除这个对话吗？')) return;
+    try {
+        var res = await fetch('/api/chat/conversations/' + convId, {
+            method: 'DELETE',
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+        if (res.ok) {
+            if (currentConversationId === convId) {
+                currentConversationId = null;
+                clearMessagesArea();
+            }
+            loadConversations();
+        }
+    } catch (e) {
+        console.error('删除对话失败:', e);
+    }
+}
+
+// 清空消息区域并显示欢迎消息
+function clearMessagesArea() {
+    var messagesArea = document.getElementById('messages-area');
+    messagesArea.innerHTML = '';
+    var welcome = document.createElement('div');
+    welcome.className = 'welcome-message';
+    welcome.innerHTML = '<div class="welcome-icon"><svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="36" fill="#3B82F6" opacity="0.1"/><circle cx="40" cy="40" r="24" fill="#3B82F6" opacity="0.2"/><path d="M28 48 L40 28 L52 48" stroke="#3B82F6" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h2>你好，我是 AI 助手</h2><p>我可以帮助你分析文档内容。请先上传文件，然后我会提取内容，你可以问我任何关于文档的问题。</p><div class="feature-list"><div class="feature-item"><span class="feature-icon">📄</span><span>支持 PDF、Word、TXT 文档</span></div><div class="feature-item"><span class="feature-icon">💬</span><span>智能问答互动</span></div><div class="feature-item"><span class="feature-icon">📝</span><span>内容摘要总结</span></div></div>';
+    messagesArea.appendChild(welcome);
 }
 
 // 上传文件
@@ -184,18 +287,6 @@ function sendMessage() {
     var message = inputEl.value.trim();
     if (!message) return;
     
-    // 检查消息是否与文档相关
-    var isFileRelated = hasFile && (
-        message.includes('总结') || 
-        message.includes('分析') || 
-        message.includes('文档') || 
-        message.includes('文件') ||
-        message.includes('这个') ||
-        message.includes('内容')
-    );
-    
-    console.log('Message:', message, 'isFileRelated:', isFileRelated);
-    
     isLoading = true;
     setInputEnabled(false);
     
@@ -227,6 +318,10 @@ function sendMessage() {
     var formData = new URLSearchParams();
     formData.append('message', message);
     
+    if (currentConversationId) {
+        formData.append('conversation_id', currentConversationId);
+    }
+    
     if (isFileRelated && currentFilePath) {
         formData.append('file_path', currentFilePath);
     }
@@ -246,21 +341,22 @@ function sendMessage() {
         if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
         return res.json();
     })
-    .then(function(data) {
+    .then(async function(data) {
         var response = data.response || data;
-        
-        // 清理响应
-        response = response.replace(/\[THINKING\][\s\S]*?\[\/THINKING\]/g, '');
-        response = response.replace(/\[MESSAGE\]/g, '').replace(/\[\/MESSAGE\]/g, '');
-        
+
+        // 如果后端返回了 conversation_id，更新当前对话
+        if (data.conversation_id) {
+            currentConversationId = data.conversation_id;
+            await loadConversations();
+        }
+
         // 渲染 markdown
         try {
             contentEl.innerHTML = marked ? marked.parse(response) : escapeHtml(response);
         } catch (e) {
             contentEl.innerHTML = escapeHtml(response);
         }
-        
-        // 确保内容不溢出
+
         contentEl.style.wordWrap = 'break-word';
         contentEl.style.overflowWrap = 'break-word';
     })
@@ -281,9 +377,11 @@ function addMessage(role, content) {
     
     var wrapper = document.createElement('div');
     wrapper.className = 'message ' + role;
-    wrapper.style.maxWidth = '100%';
-    wrapper.style.width = '100%';
-    wrapper.style.boxSizing = 'border-box';
+    
+    var avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = role === 'user' ? 'U' : 'AI';
+    wrapper.appendChild(avatar);
     
     var contentHtml;
     try {
@@ -294,14 +392,7 @@ function addMessage(role, content) {
     
     var contentWrapper = document.createElement('div');
     contentWrapper.className = 'message-content';
-    contentWrapper.style.wordWrap = 'break-word';
-    contentWrapper.style.overflowWrap = 'break-word';
-    contentWrapper.style.maxWidth = '100%';
-    contentWrapper.style.width = '100%';
-    contentWrapper.style.boxSizing = 'border-box';
     contentWrapper.innerHTML = contentHtml;
-    
-    wrapper.innerHTML = '<div class="message-avatar">' + (role === 'user' ? 'U' : 'AI') + '</div>';
     wrapper.appendChild(contentWrapper);
     
     messagesArea.appendChild(wrapper);

@@ -5,11 +5,14 @@ from pydantic import BaseModel
 from typing import List, Optional
 import tempfile
 import os
+import logging
 from .. import models
 from ..database import get_db
 from ..auth import get_current_user
 from ..rag import create_collection, add_documents
 from ..file_analysis import analyze_file
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -78,7 +81,7 @@ class FileAnalysisRequest(BaseModel):
 @router.post("/analyze")
 async def analyze_uploaded_file(
     file: UploadFile = File(...),
-    analysis_request: FileAnalysisRequest,
+    analysis_request: FileAnalysisRequest = None,
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user)
 ):
@@ -121,7 +124,10 @@ async def analyze_uploaded_file(
     """
     
     # 验证上传的文件
+    logger.info(f"Received file upload request: {file.filename if file else 'None'}")
+    
     if not file.filename or len(file.filename) == 0:
+        logger.warning("No filename provided in uploaded file")
         raise HTTPException(
             status_code=400,
             detail="No filename provided in uploaded file"

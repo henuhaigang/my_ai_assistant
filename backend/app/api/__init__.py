@@ -9,3 +9,6 @@ api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(chat_router, prefix="/chat", tags=["chat"])
 api_router.include_router(knowledge_router, prefix="/knowledge", tags=["knowledge"])
 api_router.include_router(user_router, prefix="/user", tags=["user"])
+
+from .files import router as files_router
+api_router.include_router(files_router, prefix="/files", tags=["文件"])

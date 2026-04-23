@@ -92,7 +92,6 @@ async def delete_conversation(
     conv = await db.get(models.Conversation, conv_id)
     if not conv or conv.user_id != user.id:
         raise HTTPException(status_code=404, detail="Conversation not found")
-    # 删除对话关联的消息
     result = await db.execute(
         select(models.Message).where(models.Message.conversation_id == conv_id)
     )
@@ -101,6 +100,13 @@ async def delete_conversation(
         await db.delete(msg)
     await db.delete(conv)
     await db.commit()
+    return {"status": "ok"}
+
+@router.post("/cancel")
+async def cancel_generation(
+    user=Depends(get_current_user)
+):
+    await redis_client.set(f"chat_cancel:{user.id}", "1", ex=60)
     return {"status": "ok"}
 
 @router.post("/chat")
@@ -159,8 +165,18 @@ async def chat(
     chat_messages = [{"role": "system", "content": system_content}] + chat_messages
 
     full_response = ""
+    cancelled = False
     async for token in generate_stream(chat_messages):
+        if cancelled:
+            break
+        from ..llm import check_cancel
+        if await check_cancel(user.id):
+            cancelled = True
+            break
         full_response += token
+
+    from ..llm import clear_cancel
+    await clear_cancel(user.id)
 
     cleaned_response = clean_llm_response(full_response)
 
@@ -169,4 +185,4 @@ async def chat(
     conv.updated_at = datetime.now(timezone.utc)
     await db.commit()
 
-    return {"response": cleaned_response, "conversation_id": conv.id}
+    return {"response": cleaned_response, "conversation_id": conv.id, "cancelled": cancelled}

@@ -91,9 +91,9 @@ async def generate_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str,
 async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerator[str, None]:
     base_url = settings.OLLAMA_BASE_URL.rstrip('/v1').rstrip('/')
     chat_url = f"{base_url}/api/chat"
-    
+
     client = httpx.AsyncClient(timeout=120.0)
-    
+
     try:
         async with client.stream('POST', chat_url, json={
             "model": settings.OLLAMA_MODEL,
@@ -109,7 +109,7 @@ async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerat
                             msg = data['message']
                             thinking = msg.get('thinking', '')
                             content = msg.get('content', '')
-                            
+
                             if thinking:
                                 yield f"[THINKING]{thinking}[/THINKING]"
                             if content:
@@ -126,3 +126,14 @@ async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerat
         yield f"Error: {str(e) if str(e) else 'Unknown error'}"
     finally:
         await client.aclose()
+
+
+async def check_cancel(user_id: int) -> bool:
+    from .redis_client import redis_client
+    val = await redis_client.get(f"chat_cancel:{user_id}")
+    return val is not None
+
+
+async def clear_cancel(user_id: int):
+    from .redis_client import redis_client
+    await redis_client.delete(f"chat_cancel:{user_id}")

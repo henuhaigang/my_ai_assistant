@@ -297,7 +297,15 @@ function setSendButtonPause(isPaused) {
 }
 
 // 取消当前聊天请求
-function cancelChat() {
+async function cancelChat() {
+    try {
+        await fetch('/api/chat/cancel', {
+            method: 'POST',
+            headers: {'Authorization': 'Bearer ' + token}
+        });
+    } catch (e) {
+        console.error('通知后端取消失败:', e);
+    }
     if (abortController) {
         abortController.abort();
     }

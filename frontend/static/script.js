@@ -27,11 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
         inputEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                if (isLoading) {
-                    cancelChat();
-                } else {
-                    sendMessage();
-                }
+                if (isLoading) return;
+                sendMessage();
             }
         });
     }

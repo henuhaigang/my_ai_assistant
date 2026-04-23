@@ -128,12 +128,17 @@ async def generate_ollama_stream(messages: List[Dict[str, str]]) -> AsyncGenerat
         await client.aclose()
 
 
+# 内存取消标志，key=user_id
+_cancel_flags: dict = {}
+
+
 async def check_cancel(user_id: int) -> bool:
-    from .redis_client import redis_client
-    val = await redis_client.get(f"chat_cancel:{user_id}")
-    return val is not None
+    return _cancel_flags.get(user_id, False)
+
+
+async def set_cancel(user_id: int):
+    _cancel_flags[user_id] = True
 
 
 async def clear_cancel(user_id: int):
-    from .redis_client import redis_client
-    await redis_client.delete(f"chat_cancel:{user_id}")
+    _cancel_flags.pop(user_id, None)

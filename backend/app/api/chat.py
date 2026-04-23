@@ -11,8 +11,7 @@ from typing import List, Optional, Dict, Any
 from .. import models
 from ..database import get_db
 from ..auth import get_current_user
-from ..redis_client import redis_client
-from ..llm import generate_stream
+from ..llm import generate_stream, check_cancel, clear_cancel
 from ..tools import tools, call_tool
 from ..rag import search
 from ..file_analysis import analyze_file
@@ -106,7 +105,8 @@ async def delete_conversation(
 async def cancel_generation(
     user=Depends(get_current_user)
 ):
-    await redis_client.set(f"chat_cancel:{user.id}", "1", ex=60)
+    from ..llm import set_cancel
+    await set_cancel(user.id)
     return {"status": "ok"}
 
 @router.post("/chat")
@@ -169,13 +169,11 @@ async def chat(
     async for token in generate_stream(chat_messages):
         if cancelled:
             break
-        from ..llm import check_cancel
         if await check_cancel(user.id):
             cancelled = True
             break
         full_response += token
 
-    from ..llm import clear_cancel
     await clear_cancel(user.id)
 
     cleaned_response = clean_llm_response(full_response)

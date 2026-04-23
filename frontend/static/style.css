@@ -607,6 +607,10 @@ body {
     background: var(--primary-dark);
 }
 
+.send-btn[style*="EF4444"]:hover {
+    background: #DC2626 !important;
+}
+
 .send-btn:disabled {
     background: #D1D5DB;
     cursor: not-allowed;

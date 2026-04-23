@@ -5,6 +5,7 @@ var currentFilePath = sessionStorage.getItem('filePath');
 var isUploading = false;
 var isAnalyzing = false;
 var isLoading = false;
+var abortController = null;
 var hasFile = sessionStorage.getItem('hasFileUploaded') === 'true';
 // 对话管理
 var currentConversationId = null;
@@ -26,7 +27,11 @@ document.addEventListener('DOMContentLoaded', function() {
         inputEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage();
+                if (isLoading) {
+                    cancelChat();
+                } else {
+                    sendMessage();
+                }
             }
         });
     }
@@ -278,17 +283,46 @@ function setInputEnabled(enabled) {
     if (sendBtn) sendBtn.disabled = !enabled;
 }
 
+// 切换发送按钮为暂停/停止状态
+function setSendButtonPause(isPaused) {
+    var sendBtn = document.getElementById('send-btn');
+    if (!sendBtn) return;
+    
+    if (isPaused) {
+        sendBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>';
+        sendBtn.title = '停止生成';
+        sendBtn.style.background = '#EF4444';
+    } else {
+        sendBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+        sendBtn.title = '发送';
+        sendBtn.style.background = '';
+    }
+}
+
+// 取消当前聊天请求
+function cancelChat() {
+    if (abortController) {
+        abortController.abort();
+    }
+}
+
 // 发送消息
 function sendMessage() {
-    console.log('sendMessage called', {hasFile: hasFile, currentFilePath: currentFilePath, isLoading: isLoading});
-    if (isUploading || isAnalyzing || isLoading) return;
+    if (isLoading) {
+        // 正在加载，执行暂停操作
+        cancelChat();
+        return;
+    }
+    
+    if (isUploading || isAnalyzing) return;
     
     var inputEl = document.getElementById('input');
     var message = inputEl.value.trim();
     if (!message) return;
     
     isLoading = true;
-    setInputEnabled(false);
+    abortController = new AbortController();
+    setSendButtonPause(true);
     
     // 添加用户消息
     addMessage('user', message);
@@ -326,18 +360,16 @@ function sendMessage() {
         formData.append('file_path', currentFilePath);
     }
     
-    console.log('Selected API:', apiUrl);
-    
     fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Authorization': 'Bearer ' + token,
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: formData
+        body: formData,
+        signal: abortController.signal
     })
     .then(function(res) {
-        console.log('Response status:', res.status);
         if (!res.ok) return res.text().then(function(t) { throw new Error(t); });
         return res.json();
     })
@@ -361,12 +393,17 @@ function sendMessage() {
         contentEl.style.overflowWrap = 'break-word';
     })
     .catch(function(err) {
-        console.error('Error:', err);
-        contentEl.innerHTML = '❌ 错误：' + err.message;
+        if (err.name === 'AbortError') {
+            contentEl.innerHTML = '<span style="color: #9CA3AF;">已停止生成</span>';
+        } else {
+            console.error('Error:', err);
+            contentEl.innerHTML = '❌ 错误：' + err.message;
+        }
     })
     .finally(function() {
         isLoading = false;
-        setInputEnabled(true);
+        abortController = null;
+        setSendButtonPause(false);
     });
 }
 
